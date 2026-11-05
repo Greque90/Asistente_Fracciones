@@ -33,6 +33,8 @@ with st.sidebar:
     st.caption("La IA propone; la docente decide. Todo se guarda solo en esta sesión.")
     modo = st.radio("Modo", ["Demostración (no envía nada)", "Con API de Anthropic"], index=0)
     demo = modo.startswith("Demostración")
+    if demo:
+        st.info("El modo demostración NO lee las imágenes: muestra resultados de ejemplo para recorrer la aplicación. Para transcribir y clasificar las fotos reales, elegí «Con API de Anthropic».")
     api_key, modelo = "", analisis.MODELO_POR_DEFECTO
     if not demo:
         api_key = st.text_input("Clave de la API", type="password", value=os.environ.get("ANTHROPIC_API_KEY", ""))
@@ -140,7 +142,7 @@ with t_an:
                 except Exception as e:
                     item["error"] = str(e)
                 barra.progress(n / len(pendientes))
-            st.success("Análisis terminado. Pasá a 'Verificar'.")
+            st.success("Análisis terminado. Pasá a 'Verificar'." + (" (Modo demostración: los resultados son ejemplos, no leen las imágenes.)" if demo else ""))
     for item in ss["items"]:
         if item.get("error"):
             st.error(f"{item['id']}: {item['error']}")
@@ -160,6 +162,8 @@ with t_ver:
         ia = item["ia"]
         col_img, col_ia = st.columns(2)
         col_img.image(item["imagen"], use_container_width=True)
+        if ia.get("es_demo"):
+            st.error("Este resultado es un EJEMPLO de demostración y no corresponde a la imagen. Para analizar las fotos reales, usá el modo «Con API de Anthropic».")
         col_ia.markdown("**Transcripción (IA)**")
         col_ia.code(ia["transcripcion"] or "(vacía)", language=None)
         if ia["requiere_revision"]:

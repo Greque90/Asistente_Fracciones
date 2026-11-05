@@ -227,7 +227,11 @@ _DEMO = [
 
 
 def analizar_demo(indice, esquema):
-    return normalizar_resultado(_DEMO[indice % len(_DEMO)], esquema)
+    """Resultado de ejemplo: NO lee la imagen. Sirve para recorrer la aplicación sin enviar datos."""
+    resultado = normalizar_resultado(_DEMO[indice % len(_DEMO)], esquema)
+    resultado["es_demo"] = True
+    resultado["transcripcion"] = "[EJEMPLO DE DEMOSTRACIÓN: no corresponde a esta imagen] " + resultado["transcripcion"]
+    return resultado
 
 
 def intervenciones_demo(resumen, esquema):
